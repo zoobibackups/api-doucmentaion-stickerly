@@ -1,0 +1,388 @@
+{
+	"info": {
+		"name": "Muthat-Caller-ID-APP",
+		"description": "API collection for the Muthat Caller ID backend (app.js, default port 3035).\n\nSet the `base_url` collection variable to your server (default: http://localhost:3035).\n\nAuth: the Firebase Bearer auth middleware is currently NOT applied to any route in app.js. If you re-enable it (e.g. on /search or /agora), put a Firebase ID token in the `firebase_id_token` collection variable — all requests inherit collection auth.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{ "key": "token", "value": "{{firebase_id_token}}", "type": "string" }
+		]
+	},
+	"variable": [
+		{ "key": "base_url", "value": "http://localhost:3035" },
+		{ "key": "firebase_id_token", "value": "" }
+	],
+	"item": [
+		{
+			"name": "Health & Utility",
+			"description": "Server, database and firebase health checks plus the translate helper.",
+			"item": [
+				{
+					"name": "Server check",
+					"request": {
+						"method": "GET",
+						"url": { "raw": "{{base_url}}/", "host": ["{{base_url}}"], "path": [""] },
+						"description": "Returns { status: true, successMessage: \"Server is running\" }."
+					}
+				},
+				{
+					"name": "Database check",
+					"request": {
+						"method": "GET",
+						"url": { "raw": "{{base_url}}/check_db", "host": ["{{base_url}}"], "path": ["check_db"] },
+						"description": "Runs SELECT 1 against the MySQL pool."
+					}
+				},
+				{
+					"name": "Full health check (DB + Firebase)",
+					"request": {
+						"method": "GET",
+						"url": { "raw": "{{base_url}}/check_all", "host": ["{{base_url}}"], "path": ["check_all"] }
+					}
+				},
+				{
+					"name": "Translate text",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"url": { "raw": "{{base_url}}/translate", "host": ["{{base_url}}"], "path": ["translate"] },
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"text\": \"Hello, how are you?\",\n\t\"targetLang\": \"ur\"\n}",
+							"options": { "raw": { "language": "json" } }
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"description": "Account registration (find-or-create), lookups, profile update, FCM token update and deletion.",
+			"item": [
+				{
+					"name": "Register (find or create)",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"url": { "raw": "{{base_url}}/users/register", "host": ["{{base_url}}"], "path": ["users", "register"] },
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"first_name\": \"Aftab\",\n\t\"last_name\": \"Khan\",\n\t\"mobile_number\": 3001234567,\n\t\"email\": \"user@example.com\",\n\t\"type\": \"verified\",\n\t\"fcm_token\": \"fcm-token-here\",\n\t\"countryiso2\": \"PK\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"description": "Lookup order: 1) mobile_number + countryiso2 (skipped when mobile_number missing), 2) email (skipped when email missing), 3) create the account. Message is \"User Found successfully\" vs \"User Created successfully\". All fields optional; email must be a valid email when present."
+					}
+				},
+				{
+					"name": "Find by number",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"url": { "raw": "{{base_url}}/users/findbynumber", "host": ["{{base_url}}"], "path": ["users", "findbynumber"] },
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"mobile_number\": 3001234567,\n\t\"countryiso2\": \"PK\"\n}",
+							"options": { "raw": { "language": "json" } }
+						}
+					}
+				},
+				{
+					"name": "Find user for call log & video call",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"url": { "raw": "{{base_url}}/users/finUserByNumberForCallLogAndVideoCall", "host": ["{{base_url}}"], "path": ["users", "finUserByNumberForCallLogAndVideoCall"] },
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"mobile_number\": 3001234567,\n\t\"countryiso2\": \"PK\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"description": "Returns true (200) when the number belongs to a verified app user, otherwise false (404)."
+					}
+				},
+				{
+					"name": "Get user by id",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/users/:id",
+							"host": ["{{base_url}}"],
+							"path": ["users", ":id"],
+							"variable": [{ "key": "id", "value": "1" }]
+						}
+					}
+				},
+				{
+					"name": "Update user",
+					"request": {
+						"method": "PUT",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"url": {
+							"raw": "{{base_url}}/users/:id",
+							"host": ["{{base_url}}"],
+							"path": ["users", ":id"],
+							"variable": [{ "key": "id", "value": "1" }]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"first_name\": \"Aftab\",\n\t\"last_name\": \"Khan\",\n\t\"mobile_number\": 3001234567,\n\t\"email\": \"user@example.com\",\n\t\"profile_url\": \"https://example.com/avatar.jpg\",\n\t\"date_of_birth\": \"1995-01-01\",\n\t\"gender\": \"male\",\n\t\"type\": \"verified\",\n\t\"fcm_token\": \"fcm-token-here\",\n\t\"countryiso2\": \"PK\"\n}",
+							"options": { "raw": { "language": "json" } }
+						}
+					}
+				},
+				{
+					"name": "Update FCM token",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"url": { "raw": "{{base_url}}/users/update_fcm", "host": ["{{base_url}}"], "path": ["users", "update_fcm"] },
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"countryIso\": \"PK\",\n\t\"fcm_token\": \"new-fcm-token-here\",\n\t\"user_id\": \"1\",\n\t\"mobile_number\": 3001234567,\n\t\"type\": \"verified\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"description": "All five fields are required."
+					}
+				},
+				{
+					"name": "Delete user",
+					"request": {
+						"method": "DELETE",
+						"url": {
+							"raw": "{{base_url}}/users/:id",
+							"host": ["{{base_url}}"],
+							"path": ["users", ":id"],
+							"variable": [{ "key": "id", "value": "1" }]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Countries",
+			"description": "Read-only reference data. POST/PUT/DELETE are rejected by the service.",
+			"item": [
+				{
+					"name": "Get all countries",
+					"request": {
+						"method": "GET",
+						"url": { "raw": "{{base_url}}/countries", "host": ["{{base_url}}"], "path": ["countries"] }
+					}
+				},
+				{
+					"name": "Get country by iso2",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/countries/:iso2",
+							"host": ["{{base_url}}"],
+							"path": ["countries", ":iso2"],
+							"variable": [{ "key": "iso2", "value": "PK" }]
+						},
+						"description": "The :id route param is an iso2 code (e.g. PK). Unknown codes fall back to United States."
+					}
+				}
+			]
+		},
+		{
+			"name": "User Friends",
+			"description": "Contact-list sync. GET /, PUT and DELETE return 405.",
+			"item": [
+				{
+					"name": "Sync contacts",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"url": { "raw": "{{base_url}}/user_friends", "host": ["{{base_url}}"], "path": ["user_friends"] },
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"userId\": 1,\n\t\"contacts\": [\n\t\t{ \"name\": \"Ali Raza\", \"mobile_number\": 3001112233, \"country_iso2\": \"PK\" },\n\t\t{ \"name\": \"Sara Khan\", \"mobile_number\": 3009998877, \"country_iso2\": \"PK\" }\n\t]\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"description": "Max 50 contacts per request; contacts without a mobile_number are skipped. Re-syncing the same contacts is idempotent."
+					}
+				},
+				{
+					"name": "Get friend list by user id",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/user_friends/:id",
+							"host": ["{{base_url}}"],
+							"path": ["user_friends", ":id"],
+							"variable": [{ "key": "id", "value": "1" }]
+						},
+						"description": "Stub endpoint: always returns an empty contacts list."
+					}
+				}
+			]
+		},
+		{
+			"name": "Spam Report",
+			"description": "Report numbers as spam and read reports for a number.",
+			"item": [
+				{
+					"name": "Report a number",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"url": { "raw": "{{base_url}}/spam_report", "host": ["{{base_url}}"], "path": ["spam_report"] },
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"userId\": 1,\n\t\"mobile_number\": 3001234567,\n\t\"country_iso2\": \"PK\",\n\t\"type\": \"spam\",\n\t\"comment\": \"Repeated telemarketing calls\",\n\t\"name\": \"Unknown Caller\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"description": "userId, mobile_number, country_iso2, type and comment are required; name is optional."
+					}
+				},
+				{
+					"name": "Get reports by number",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"url": { "raw": "{{base_url}}/spam_report/byNumber", "host": ["{{base_url}}"], "path": ["spam_report", "byNumber"] },
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"mobile_number\": 3001234567,\n\t\"country_iso2\": \"PK\"\n}",
+							"options": { "raw": { "language": "json" } }
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Number Name Suggestion",
+			"description": "One suggestion per user per number; suggesting again overwrites the previous name.",
+			"item": [
+				{
+					"name": "Suggest a name for a number",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"url": { "raw": "{{base_url}}/number_name_suggestion", "host": ["{{base_url}}"], "path": ["number_name_suggestion"] },
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"userId\": 1,\n\t\"mobile_number\": 3001234567,\n\t\"country_iso2\": \"PK\",\n\t\"name\": \"Aftab Office\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"description": "All fields required. Unknown country_iso2 is rejected (no US fallback here)."
+					}
+				}
+			]
+		},
+		{
+			"name": "Network",
+			"description": "Offline carrier / line-type lookup via libphonenumber (no database).",
+			"item": [
+				{
+					"name": "Carrier & country label",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"url": { "raw": "{{base_url}}/network", "host": ["{{base_url}}"], "path": ["network"] },
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"mobile_number\": \"3001234567\",\n\t\"iso2\": \"PK\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"description": "Returns a label like \"Jazz, Pakistan\"; falls back to \"Mobile, <country>\" when the number cannot be parsed."
+					}
+				}
+			]
+		},
+		{
+			"name": "Number Search",
+			"description": "Caller-ID search: app users first, then filtered_contacts (db1), then the zoobidev contact databases (db2).",
+			"item": [
+				{
+					"name": "Search a number",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"url": { "raw": "{{base_url}}/search", "host": ["{{base_url}}"], "path": ["search"] },
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"mobile_number\": \"3001234567\",\n\t\"iso2\": \"PK\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"description": "Both fields are required strings."
+					}
+				}
+			]
+		},
+		{
+			"name": "Agora",
+			"description": "Agora RTC / chat token generation for calls and video calls.",
+			"item": [
+				{
+					"name": "Generate RTC token",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"url": { "raw": "{{base_url}}/agora/rtc", "host": ["{{base_url}}"], "path": ["agora", "rtc"] },
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"channelName\": \"test_channel\",\n\t\"uid\": 12345\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"description": "Token valid for 8 hours."
+					}
+				},
+				{
+					"name": "Get RTC token by channel & uid",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/agora/rtc/channel/:channelName/agorauid/:uid",
+							"host": ["{{base_url}}"],
+							"path": ["agora", "rtc", "channel", ":channelName", "agorauid", ":uid"],
+							"variable": [
+								{ "key": "channelName", "value": "test_channel" },
+								{ "key": "uid", "value": "12345" }
+							],
+							"query": [
+								{ "key": "userAccount", "value": "user123", "disabled": true }
+							]
+						},
+						"description": "Response includes accessToken (expected by the Android client). Optional userAccount query switches to account-based tokens."
+					}
+				},
+				{
+					"name": "Generate video call token",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"url": { "raw": "{{base_url}}/agora/generateVideoCallToken", "host": ["{{base_url}}"], "path": ["agora", "generateVideoCallToken"] },
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"channelName\": \"video_call_channel\",\n\t\"uid\": 12345\n}",
+							"options": { "raw": { "language": "json" } }
+						}
+					}
+				},
+				{
+					"name": "Generate chat user token",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"url": { "raw": "{{base_url}}/agora/generateUserToken", "host": ["{{base_url}}"], "path": ["agora", "generateUserToken"] },
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"uid\": \"12345\"\n}",
+							"options": { "raw": { "language": "json" } }
+						}
+					}
+				},
+				{
+					"name": "Generate chat app token",
+					"request": {
+						"method": "GET",
+						"url": { "raw": "{{base_url}}/agora/generateAppToken", "host": ["{{base_url}}"], "path": ["agora", "generateAppToken"] }
+					}
+				}
+			]
+		}
+	]
+}
