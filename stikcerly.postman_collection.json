@@ -1,0 +1,1016 @@
+{
+	"info": {
+		"name": "Stikcerly API",
+		"_postman_id": "stikcerly-api-collection",
+		"description": "Complete API collection for Stikcerly backend. Import and set the `stickerly` variable to your base URL (e.g. http://localhost:3000).",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "stickerly",
+			"value": "http://localhost:3000",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "userId",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "packId",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "stickerId",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "commentId",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "tagId",
+			"value": "1",
+			"type": "string"
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Google Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": "{{stickerly}}/auth/google",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id_token\": \"{{google_id_token}}\"\n}"
+						}
+					}
+				},
+				{
+					"name": "Refresh Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": "{{stickerly}}/auth/refresh",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}"
+						}
+					}
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": "{{stickerly}}/auth/logout",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}"
+						}
+					}
+				},
+				{
+					"name": "Logout All",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": "{{stickerly}}/auth/logout-all"
+					}
+				}
+			]
+		},
+		{
+			"name": "Users \u2014 Me",
+			"item": [
+				{
+					"name": "Get My Profile",
+					"request": {
+						"method": "GET",
+						"url": "{{stickerly}}/users/me"
+					}
+				},
+				{
+					"name": "Update My Profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": "{{stickerly}}/users/me",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"new_username\",\n  \"bio\": \"My updated bio\"\n}"
+						}
+					}
+				},
+				{
+					"name": "Delete My Account",
+					"request": {
+						"method": "DELETE",
+						"url": "{{stickerly}}/users/me"
+					}
+				},
+				{
+					"name": "Upload My Avatar",
+					"request": {
+						"method": "POST",
+						"url": "{{stickerly}}/users/me/avatar",
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "image",
+									"type": "file",
+									"src": ""
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get My Tags",
+					"request": {
+						"method": "GET",
+						"url": "{{stickerly}}/users/me/tags"
+					}
+				},
+				{
+					"name": "Set My Tags",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": "{{stickerly}}/users/me/tags",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"tag_ids\": [1, 2, 3]\n}"
+						}
+					}
+				},
+				{
+					"name": "Get My Profile (v2)",
+					"request": {
+						"method": "GET",
+						"url": "{{stickerly}}/users/me/profile"
+					}
+				},
+				{
+					"name": "Get My Packs",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{stickerly}}/users/me/packs?type=created",
+							"host": [
+								"{{stickerly}}"
+							],
+							"path": [
+								"users",
+								"me",
+								"packs"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "created",
+									"description": "created | liked"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Users \u2014 Blocks",
+			"item": [
+				{
+					"name": "List My Blocks",
+					"request": {
+						"method": "GET",
+						"url": "{{stickerly}}/users/me/blocks"
+					}
+				},
+				{
+					"name": "Block a User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": "{{stickerly}}/users/me/blocks",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": {{userId}}\n}"
+						}
+					}
+				},
+				{
+					"name": "Unblock a User",
+					"request": {
+						"method": "DELETE",
+						"url": "{{stickerly}}/users/me/blocks/{{userId}}"
+					}
+				}
+			]
+		},
+		{
+			"name": "Users \u2014 Public",
+			"item": [
+				{
+					"name": "Search Users",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{stickerly}}/users/search?q=john",
+							"host": [
+								"{{stickerly}}"
+							],
+							"path": [
+								"users",
+								"search"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "john"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get User Public Profile",
+					"request": {
+						"method": "GET",
+						"url": "{{stickerly}}/users/{{userId}}"
+					}
+				},
+				{
+					"name": "Get User Profile (v2)",
+					"request": {
+						"method": "GET",
+						"url": "{{stickerly}}/users/{{userId}}/profile"
+					}
+				},
+				{
+					"name": "Get User Packs",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{stickerly}}/users/{{userId}}/packs?type=created",
+							"host": [
+								"{{stickerly}}"
+							],
+							"path": [
+								"users",
+								"{{userId}}",
+								"packs"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "created",
+									"description": "created | liked"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Followers",
+			"item": [
+				{
+					"name": "Get My Following",
+					"request": {
+						"method": "GET",
+						"url": "{{stickerly}}/followers/me/following"
+					}
+				},
+				{
+					"name": "Get My Followers",
+					"request": {
+						"method": "GET",
+						"url": "{{stickerly}}/followers/me/followers"
+					}
+				},
+				{
+					"name": "Get User Following",
+					"request": {
+						"method": "GET",
+						"url": "{{stickerly}}/followers/{{userId}}/following"
+					}
+				},
+				{
+					"name": "Get User Followers",
+					"request": {
+						"method": "GET",
+						"url": "{{stickerly}}/followers/{{userId}}/followers"
+					}
+				},
+				{
+					"name": "Get Follow Status",
+					"request": {
+						"method": "GET",
+						"url": "{{stickerly}}/followers/{{userId}}/status"
+					}
+				},
+				{
+					"name": "Follow User",
+					"request": {
+						"method": "POST",
+						"url": "{{stickerly}}/followers/{{userId}}"
+					}
+				},
+				{
+					"name": "Unfollow User",
+					"request": {
+						"method": "DELETE",
+						"url": "{{stickerly}}/followers/{{userId}}"
+					}
+				}
+			]
+		},
+		{
+			"name": "Home",
+			"item": [
+				{
+					"name": "Trending",
+					"request": {
+						"method": "GET",
+						"url": "{{stickerly}}/home/trending"
+					}
+				},
+				{
+					"name": "Explore",
+					"request": {
+						"method": "GET",
+						"url": "{{stickerly}}/home/explore"
+					}
+				},
+				{
+					"name": "Following Feed",
+					"request": {
+						"method": "GET",
+						"url": "{{stickerly}}/home/following"
+					}
+				},
+				{
+					"name": "Creators",
+					"request": {
+						"method": "GET",
+						"url": "{{stickerly}}/home/creators"
+					}
+				}
+			]
+		},
+		{
+			"name": "Packs",
+			"item": [
+				{
+					"name": "Create Pack",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": "{{stickerly}}/pack/",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"My Pack\",\n  \"description\": \"A cool sticker pack\"\n}"
+						}
+					}
+				},
+				{
+					"name": "List Packs",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{stickerly}}/pack/?page=1&limit=20",
+							"host": [
+								"{{stickerly}}"
+							],
+							"path": [
+								"pack",
+								""
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Pack Detail",
+					"request": {
+						"method": "GET",
+						"url": "{{stickerly}}/pack/{{packId}}"
+					}
+				},
+				{
+					"name": "Update Pack",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": "{{stickerly}}/pack/{{packId}}",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Updated Pack Name\",\n  \"description\": \"Updated description\"\n}"
+						}
+					}
+				},
+				{
+					"name": "Toggle Publish Pack",
+					"request": {
+						"method": "PATCH",
+						"url": "{{stickerly}}/pack/{{packId}}/publish"
+					}
+				},
+				{
+					"name": "Set Tray Icon",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": "{{stickerly}}/pack/{{packId}}/tray-icon",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"sticker_id\": {{stickerId}}\n}"
+						}
+					}
+				},
+				{
+					"name": "Set Pack Tags",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": "{{stickerly}}/pack/{{packId}}/tags",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"tag_ids\": [1, 2, 3]\n}"
+						}
+					}
+				},
+				{
+					"name": "Delete Pack",
+					"request": {
+						"method": "DELETE",
+						"url": "{{stickerly}}/pack/{{packId}}"
+					}
+				},
+				{
+					"name": "Like Pack",
+					"request": {
+						"method": "POST",
+						"url": "{{stickerly}}/pack/{{packId}}/like"
+					}
+				},
+				{
+					"name": "Unlike Pack",
+					"request": {
+						"method": "POST",
+						"url": "{{stickerly}}/pack/{{packId}}/unlike"
+					}
+				},
+				{
+					"name": "Record Pack View",
+					"request": {
+						"method": "POST",
+						"url": "{{stickerly}}/pack/{{packId}}/views"
+					}
+				},
+				{
+					"name": "Record Pack Share",
+					"request": {
+						"method": "POST",
+						"url": "{{stickerly}}/pack/{{packId}}/shares"
+					}
+				},
+				{
+					"name": "Record Pack Download",
+					"request": {
+						"method": "POST",
+						"url": "{{stickerly}}/pack/{{packId}}/downloads"
+					}
+				},
+				{
+					"name": "List Pack Comments",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{stickerly}}/pack/{{packId}}/comments?page=1&limit=20",
+							"host": [
+								"{{stickerly}}"
+							],
+							"path": [
+								"pack",
+								"{{packId}}",
+								"comments"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Add Pack Comment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": "{{stickerly}}/pack/{{packId}}/comments",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"text\": \"Great pack!\"\n}"
+						}
+					}
+				},
+				{
+					"name": "Delete Pack Comment",
+					"request": {
+						"method": "DELETE",
+						"url": "{{stickerly}}/pack/{{packId}}/comments/{{commentId}}"
+					}
+				}
+			]
+		},
+		{
+			"name": "Stickers",
+			"item": [
+				{
+					"name": "Create Sticker",
+					"request": {
+						"method": "POST",
+						"url": "{{stickerly}}/sticker/pack/{{packId}}",
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "image",
+									"type": "file",
+									"src": ""
+								},
+								{
+									"key": "name",
+									"value": "My Sticker",
+									"type": "text"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Bulk Create Stickers",
+					"request": {
+						"method": "POST",
+						"url": "{{stickerly}}/sticker/pack/{{packId}}/bulk",
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "images",
+									"type": "file",
+									"src": ""
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "List Stickers by Pack",
+					"request": {
+						"method": "GET",
+						"url": "{{stickerly}}/sticker/pack/{{packId}}"
+					}
+				},
+				{
+					"name": "Get Sticker Detail",
+					"request": {
+						"method": "GET",
+						"url": "{{stickerly}}/sticker/{{stickerId}}"
+					}
+				},
+				{
+					"name": "Update Sticker",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": "{{stickerly}}/sticker/{{stickerId}}",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Updated Sticker Name\"\n}"
+						}
+					}
+				},
+				{
+					"name": "Delete Sticker",
+					"request": {
+						"method": "DELETE",
+						"url": "{{stickerly}}/sticker/{{stickerId}}"
+					}
+				},
+				{
+					"name": "Like Sticker",
+					"request": {
+						"method": "POST",
+						"url": "{{stickerly}}/sticker/{{stickerId}}/like"
+					}
+				},
+				{
+					"name": "Unlike Sticker",
+					"request": {
+						"method": "POST",
+						"url": "{{stickerly}}/sticker/{{stickerId}}/unlike"
+					}
+				},
+				{
+					"name": "Record Sticker View",
+					"request": {
+						"method": "POST",
+						"url": "{{stickerly}}/sticker/{{stickerId}}/views"
+					}
+				},
+				{
+					"name": "Record Sticker Share",
+					"request": {
+						"method": "POST",
+						"url": "{{stickerly}}/sticker/{{stickerId}}/shares"
+					}
+				},
+				{
+					"name": "Record Sticker Download",
+					"request": {
+						"method": "POST",
+						"url": "{{stickerly}}/sticker/{{stickerId}}/downloads"
+					}
+				},
+				{
+					"name": "List Sticker Comments",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{stickerly}}/sticker/{{stickerId}}/comments?page=1&limit=20",
+							"host": [
+								"{{stickerly}}"
+							],
+							"path": [
+								"sticker",
+								"{{stickerId}}",
+								"comments"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Add Sticker Comment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": "{{stickerly}}/sticker/{{stickerId}}/comments",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"text\": \"Love this sticker!\"\n}"
+						}
+					}
+				},
+				{
+					"name": "Delete Sticker Comment",
+					"request": {
+						"method": "DELETE",
+						"url": "{{stickerly}}/sticker/{{stickerId}}/comments/{{commentId}}"
+					}
+				}
+			]
+		},
+		{
+			"name": "Tags",
+			"item": [
+				{
+					"name": "List All Tags",
+					"request": {
+						"method": "GET",
+						"url": "{{stickerly}}/tags/"
+					}
+				},
+				{
+					"name": "Create Tag",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": "{{stickerly}}/tags/",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"funny\"\n}"
+						}
+					}
+				},
+				{
+					"name": "Update Tag",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": "{{stickerly}}/tags/{{tagId}}",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"updated_tag\"\n}"
+						}
+					}
+				},
+				{
+					"name": "Get Tag by ID",
+					"request": {
+						"method": "GET",
+						"url": "{{stickerly}}/tags/get_by_id/{{tagId}}"
+					}
+				},
+				{
+					"name": "Delete Tag",
+					"request": {
+						"method": "DELETE",
+						"url": "{{stickerly}}/tags/{{tagId}}"
+					}
+				}
+			]
+		},
+		{
+			"name": "Image Upload",
+			"item": [
+				{
+					"name": "Upload Image",
+					"request": {
+						"method": "POST",
+						"url": "{{stickerly}}/upload_image/",
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "image",
+									"type": "file",
+									"src": ""
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Admin",
+			"item": [
+				{
+					"name": "Dashboard Stats",
+					"request": {
+						"method": "GET",
+						"url": "{{stickerly}}/admin/stats"
+					}
+				},
+				{
+					"name": "List Users",
+					"request": {
+						"method": "GET",
+						"url": "{{stickerly}}/admin/users?q=&status=&limit=20&offset=0"
+					}
+				},
+				{
+					"name": "Get User",
+					"request": {
+						"method": "GET",
+						"url": "{{stickerly}}/admin/users/{{userId}}"
+					}
+				},
+				{
+					"name": "List Packs",
+					"request": {
+						"method": "GET",
+						"url": "{{stickerly}}/admin/packs?q=&type=&user_id=&visibility=&limit=20&offset=0"
+					}
+				},
+				{
+					"name": "Get Pack Detail (with stickers)",
+					"request": {
+						"method": "GET",
+						"url": "{{stickerly}}/admin/packs/{{packId}}"
+					}
+				},
+				{
+					"name": "Delete Pack (admin)",
+					"request": {
+						"method": "DELETE",
+						"url": "{{stickerly}}/admin/packs/{{packId}}"
+					}
+				},
+				{
+					"name": "Delete Sticker (admin)",
+					"request": {
+						"method": "DELETE",
+						"url": "{{stickerly}}/admin/stickers/{{stickerId}}"
+					}
+				},
+				{
+					"name": "List Pending Pack Reports",
+					"request": {
+						"method": "GET",
+						"url": "{{stickerly}}/admin/reports/packs?limit=50&offset=0"
+					}
+				},
+				{
+					"name": "List Pending Sticker Reports",
+					"request": {
+						"method": "GET",
+						"url": "{{stickerly}}/admin/reports/stickers?limit=50&offset=0"
+					}
+				},
+				{
+					"name": "Resolve Pack Report",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"status\":\"dismissed\"}"
+						},
+						"url": "{{stickerly}}/admin/reports/packs/{{reportId}}"
+					}
+				},
+				{
+					"name": "Resolve Sticker Report",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"status\":\"dismissed\"}"
+						},
+						"url": "{{stickerly}}/admin/reports/stickers/{{reportId}}"
+					}
+				},
+				{
+					"name": "List Bans",
+					"request": {
+						"method": "GET",
+						"url": "{{stickerly}}/admin/bans"
+					}
+				},
+				{
+					"name": "Ban User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": "{{stickerly}}/admin/bans",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": {{userId}},\n  \"reason\": \"Violation of terms\"\n}"
+						}
+					}
+				},
+				{
+					"name": "Unban User",
+					"request": {
+						"method": "DELETE",
+						"url": "{{stickerly}}/admin/bans/{{userId}}"
+					}
+				}
+			]
+		}
+	]
+}
